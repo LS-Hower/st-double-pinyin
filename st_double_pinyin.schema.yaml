@@ -1,0 +1,126 @@
+# Rime schema
+# encoding: utf-8
+
+schema:
+  schema_id: st_double_pinyin
+  name: ST 双拼
+  version: "0.03"
+  author:
+    - LS_Hower
+  description: |
+    LS 随便制作的一套双拼方案，使用朙月拼音，使用 https://macroxue.github.io/shuangpin/eval.html 生成
+  dependencies:
+    - stroke
+
+switches:
+  - name: ascii_mode
+    reset: 0
+    states: [ 中文, 西文 ]
+  - name: full_shape
+    states: [ 半角, 全角 ]
+  - name: simplification
+    reset: 1
+    states: [ 漢字, 汉字 ]
+  - name: ascii_punct
+    states: [ 。，, ．， ]
+
+engine:
+  processors:
+    - ascii_composer
+    - recognizer
+    - key_binder
+    - speller
+    - punctuator
+    - selector
+    - navigator
+    - express_editor
+  segmentors:
+    - ascii_segmentor
+    - matcher
+    - abc_segmentor
+    - punct_segmentor
+    - fallback_segmentor
+  translators:
+    - punct_translator
+    - reverse_lookup_translator
+    - script_translator
+
+  filters:
+    - simplifier
+    - uniquifier
+
+speller:
+  alphabet: "bpmfdtnlgkhjqxviurzcsywaoe"
+  initials: "bpmfdtnlgkhjqxviurzcsywaoe"
+  delimiter: " '"
+  algebra:
+    - erase/^xx$/
+    - derive/^([jqxy])u$/$1v/
+    - xform/^([aoe].*)$/O$1/
+    - xform/^zh/V/
+    - xform/^ch/I/
+    - xform/^sh/U/
+    - xform/iang$/R/
+    - xform/iong$/M/
+    - xform/uang$/R/
+    - xform/ang$/Q/
+    - xform/ong$/M/
+    - xform/eng$/X/
+    - xform/ian$/Z/
+    - xform/iao$/F/
+    - xform/ing$/H/
+    - xform/uai$/T/
+    - xform/uan$/P/
+    - xform/ai$/Y/
+    - xform/an$/J/
+    - xform/ao$/W/
+    - xform/ou$/N/
+    - xform/ei$/C/
+    - xform/en$/D/
+    - xform/er$/F/
+    - xform/ia$/L/
+    - xform/ie$/S/
+    - xform/in$/G/
+    - xform/iu$/K/
+    - xform/ua$/L/
+    - xform/ue$/T/
+    - xform/ui$/V/
+    - xform/un$/B/
+    - xform/uo$/O/
+    - xform/ve$/T/
+    - xlit/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/
+
+translator:
+  dictionary: luna_pinyin
+  prism: st_double_pinyin
+  preedit_format:
+    - "xform/^//"
+
+
+
+reverse_lookup:
+  dictionary: stroke
+  enable_completion: true
+  prefix: "`"
+  suffix: "'"
+  tips: 〔笔画〕
+  preedit_format:
+    - xlit/hspnz/一丨丿丶乙/
+  comment_format:
+    - xform/([nl])v/$1ü/
+
+punctuator:
+  import_preset: default
+
+key_binder:
+  import_preset: default
+  bindings:
+    - { when: has_menu, accept: comma, send: comma }
+    - { when: has_menu, accept: period, send: period }
+    - { when: has_menu, accept: bracketleft, send: Prior }
+    - { when: has_menu, accept: bracketright, send: Next }
+
+recognizer:
+  import_preset: default
+  patterns:
+    reverse_lookup: "`[a-z]*'?$"
